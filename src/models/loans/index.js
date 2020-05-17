@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
- 
+
 const loanSchema = new Schema({
     customerName: {
         type: String,
@@ -19,15 +19,15 @@ const loanSchema = new Schema({
     },
     loanTenure: {
         type: Number
-},
-loanStatus: {
-    type: String,
-    default: "created"
-}
-},
-{ timestamps: true }
-);
- 
+    },
+    loanStatus: {
+        type: String,
+        default: "created"
+    }
+}, {
+    timestamps: true
+});
 
- 
+
+
 module.exports = mongoose.model('Loan', loanSchema);
