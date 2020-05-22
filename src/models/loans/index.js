@@ -20,6 +20,10 @@ const loanSchema = new Schema({
     loanTenure: {
         type: Number
     },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
     loanStatus: {
         type: String,
         default: "created"
