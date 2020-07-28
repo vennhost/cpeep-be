@@ -18,6 +18,12 @@ const userSchema = new Schema({
     }],
     name: {
         type: String
+    },
+    deposit: {
+        type: Number
+    },
+    commission: {
+        type: Number
     }
 });
 

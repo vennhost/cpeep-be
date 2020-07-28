@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Loan = require("../../models/loans");
+const Transaction = require("../../models/transactions");
 const User = require("../../models/users");
 const {
   basic,
@@ -13,8 +13,8 @@ router.get('/', async (req, res) => {
   try {
 
     const mySort = { createdAt: -1 }
-    const loans = await Loan.find({}).sort(mySort)
-    res.send(loans)
+    const transactions = await Transaction.find({}).sort(mySort)
+    res.send(transactions)
 
   } catch (error) {
     console.log(error)
@@ -22,11 +22,23 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/total/:userId', async (req, res) => {
+
+    try {
+      const transactions = await Transaction.find({ $sum:{$amount}})
+      res.send(transactions)
+  
+    } catch (error) {
+      console.log(error)
+      res.send(error)
+    }
+  });
+
 router.get('/:id', async (req, res) => {
 
   try {
-    const loan = await (await Loan.findById(req.params.id));
-    res.send(loan)
+    const transaction = await (await Transaction.findById(req.params.id));
+    res.send(transaction)
 
   } catch (error) {
     console.log(error)
@@ -38,31 +50,10 @@ router.get('/user/:userId', async (req, res) => {
 
   try {
     const user = req.body.user
-    const loan = await (await Loan.find({user: req.params.userId}));
+    const transaction = await (await Transaction.find({user: req.params.userId}));
     console.log(req.params.userId)
     console.log(user)
-    res.send(loan)
-
-  } catch (error) {
-    console.log(error)
-    res.send(error)
-  }
-});
-
-router.get('/totals', async (req, res) => {
-
-  try {
-    const loans = await Loan.aggregate(
-      [{
-        $group : {
-            
-            total : {
-                $sum : "$amount"
-            }
-        }
-    }],callback
-    )
-    res.send(loans)
+    res.send(transaction)
 
   } catch (error) {
     console.log(error)
@@ -73,15 +64,15 @@ router.get('/totals', async (req, res) => {
 router.post("/", async (req, res) => {
   try {
 
-    let loan = new Loan({
+    let transaction = new Transaction({
       ...req.body
     });
 
-    await loan.save();
+    await transaction.save();
       console.log(req.body)
     await User.findByIdAndUpdate(req.body.user._id, {
       $push: {
-        loans: loan._id
+        transaction: transaction._id
       }
     })
 
@@ -96,14 +87,14 @@ router.post("/", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   try {
-    const loanEdit = await Loan.findByIdAndUpdate(
-      req.params.id,
+    const loanEdit = await Exp.findByIdAndUpdate(
+      req.params.expId,
       {
         $set: { ...req.body }
       },
       { new: true }
     );
-    res.send(loanEdit);
+    res.send(editExp);
   } catch (error) {
     console.log(error);
     res.send(error);
@@ -112,11 +103,11 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    const loan = await Loan.findById(req.params.id);
+    const transaction = await Transaction.findById(req.params.id);
     
-    if (loan) {
-      const deletedLoan = await Loan.findByIdAndDelete(req.params.id);
-      res.send({ message: "Loan Deleted", deletedLoan });
+    if (transaction) {
+      const deletedTransaction = await Transaction.findByIdAndDelete(req.params.id);
+      res.send({ message: "Transaction Deleted", deletedTransaction });
     } else {
       res.status(401).send("You are not authorized to delete this Loan.");
     }
